@@ -6,10 +6,7 @@ class MCP7940:
         def __init__(self):
             self.mI2c = I2C(scl=Pin(21), sda=Pin(22), freq=100000)
             self.WriteReg(0x00, 0x80)
-            #buf=bytearray(2)
-            #buf[0]=0x00
-            #buf[1]=0x80
-            #self.mI2c.writeto(111, buf, True)
+
             
         def WriteReg(self,reg,data):
             buf=bytearray(2)
@@ -92,9 +89,7 @@ class MCP7940:
             bufm[0] = 0x05
             bufm[1] = mn
             self.mI2c.writeto(111, bufm, True)
-                
-
-                
+                               
         def GetTime(self):
             sec = self.ReadReg(0x00)
             sech = hex(sec[0]&~(1<<7))
@@ -142,9 +137,7 @@ class MCP7940:
             y1 = (int(yh) & 0x0f)
             y = ((y10 * 10) + y1)
             print("Date : {}/{}/{}".format(d,m,y))
-            
-
-            
+                       
         def SetDay(self,days):
             
             day = hex(days)
@@ -297,9 +290,7 @@ class MCP7940:
             bufmn[0] = 0x16
             bufmn[1] = mn
             self.mI2c.writeto(111, bufmn, True)    
-            
-            
-            
+                                   
         def Binread(self):
             mins = self.ReadReg(0x07)
             print("Control Register value is {}".format(bin(mins[0])))
@@ -311,9 +302,7 @@ class MCP7940:
             print("Alam1 Register value is {}".format(bin(sec[0])))
             
         
-t = MCP7940()
-t.GetTime()
-t.GetDate()
+
 
          
          
