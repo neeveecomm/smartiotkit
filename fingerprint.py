@@ -1,7 +1,4 @@
 from machine import UART
-from micropython import const
-from MQTT import mqtt
-m = mqtt()
 import time
 
 class fingerprint:
@@ -21,7 +18,7 @@ class fingerprint:
         self.FINGERPRINT_REGMODEL = 0x05
         self.FINGERPRINT_STORE = 0x06
         self.FINGERPRINT_SEARCH = 0x04
-        print('UART initialized')
+        #print('UART initialized')
         self.verify_password()
            
     def verify_password(self): #Verifying the passoword with the device password 
@@ -29,10 +26,10 @@ class fingerprint:
         self.send_packet([self.FINGERPRINT_VERIFYPASSWORD] + list(self.password))
         time.sleep(1)
         ret = self.uart.read()
-        print(ret)
+        #print(ret)
         vpaswd = ret[9]
         if vpaswd == 0:
-            print('Verify Password is okay')
+            print('Biometric is connected')
    
     def get_image(self): #Getting the fingerprint image
         
@@ -40,7 +37,7 @@ class fingerprint:
         print('Getting Fingerprint Image')
         time.sleep(1)
         ret = self.uart.read()
-        print(ret)
+        #print(ret)
         if ret[9] == 0:
             print('Get Image Done')
             return True
@@ -53,7 +50,7 @@ class fingerprint:
         print('Converting Image buffer to Template')
         time.sleep(1)
         ret = self.uart.read()
-        print(ret)
+        #print(ret)
         if ret[9] == 0:
             print('Image Convert Done')
             return True
@@ -78,12 +75,11 @@ class fingerprint:
         print('Searching Finger')
         time.sleep(1)
         ret = self.uart.read()
-        print(ret)
+        #print(ret)
         if ret[9] == 0:    
             fingerid = ret[11]
-            print('Finger ID:{}'.format(fingerid))
-            m.mqtt_publish(message = 'ID is:{}'.format(fingerid)) #publishing the message to the AWS IoT 
-            return True
+            print('Fingerid :{}'.format(fingerid))
+            return fingerid;
         print('No Match found!!')
         return False
         
@@ -91,7 +87,8 @@ class fingerprint:
         
         self.get_image()
         self.image_convert()
-        self.finger_search()
+        fingerid = self.finger_search()
+        return fingerid;
      
     def register_fingerprint(self, fingerid): #Registering the fingerprint
         
@@ -115,7 +112,7 @@ class fingerprint:
         packet.append(checksum >> 8)
         packet.append(checksum & 0xFF)
         
-        print(packet)
+        #print(packet)
 
         self.uart.write(bytearray(packet))  
         
@@ -123,13 +120,7 @@ class fingerprint:
          
         ret = self.uart.read()
         print(ret)
-        
-    def reset_library(self):
-        
-        self.send_packet([0x0d])
-        print('Deleting Library')
-        time.sleep(1)
-        self.get_packet()
+
         
         
         
@@ -140,5 +131,4 @@ class fingerprint:
   
   
         
-
 
