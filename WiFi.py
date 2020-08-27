@@ -1,50 +1,62 @@
+import ujson
+import json
 import network
-import time
-router = [("ssid", "password"), ("rraaghul", "password"), ("user4", "password")]
+from network import WLAN
+import machine
+import socket
+import usocket as socket
+import gc
+gc.collect()
 
-class Wifi:
-        def __init__(self):
-            self.wlan = network.WLAN(network.STA_IF)
-            self.wlan.active(True)
-          
-        def ConnectionStatus(self):
-            data = self.wlan.isconnected()
-            if data:
-               print('WiFi is connected')
-            else:
-                print('WiFi is not connected!!')
+class WAVWireless():
+    def __init__(self):
+        self.filename = "wifiap.json"
+        self.wifiCfg = self.reload()
+        self.sta_if = network.WLAN(network.STA_IF)
+        self.sta_if.active(True)
+        self.wlan = WLAN(network.STA_IF)
+        #self.led = machine.Pin(2, machine.Pin.OUT)
         
-        def wificonnection(self,ssid, password):
-            data = self.wlan.connect(ssid, password)
-            return data
+    def reloadCfg(self):
+        self.wifiCfg = self.reload()
         
-        def wifiScan(self):
-            data = self.wlan.scan()
-            return data
+    def reload(self):
+        list = []
+        with open(self.filename) as fp:
+            while True:
+                res = []
+                d = {}
+                data = fp.readline()
+                if data == '':
+                    break
+                apdata = ujson.dumps(data)
+                data = data.replace("\r\n", "")
+                for sub in data.split(', '):
+                    if ':' in sub:
+                        res = sub.split(': ', 1)
+                        #print(res)
+                        d[res[0]] = res[1]
+                list.append(d)
+            return list
         
-        def wifiDisconnect(self):
-            data = self.wlan.disconnect()
-            return data
-        
-        def wifiInfo(self):
-            data = self.wlan.ifconfig()
-            return data
-          
-        def wifiAutoconnect(self):
-            
-            data = self.wlan.isconnected()
-            if data:
-               print('WiFi is connected')
-            else:
-              print('Wifi is not connected') 
-              for i in router:
-                 self.wlan.connect(*i)
-                 time.sleep(3)
-              if data:
-                 print('WiFi is connected')
-                 
-                
-        
-
-
-
+    def scanAndConnect(self):
+        self.conn = 0
+        if not self.sta_if.isconnected():
+            self.sta_if.active(True)
+            nets = self.wlan.scan()
+            for net in nets:
+                #print(net)
+                #print(net[0])
+                for i in range(len(self.wifiCfg)):
+                    ssid = net[0].decode('ASCII')
+                    if ssid == self.wifiCfg[i]['wifiap']:
+                        #print(ssid)
+                        #print(self.wifiCfg[i]['password'])
+                        password = (self.wifiCfg[i]['password'])
+                        self.wlan.connect(ssid, password)
+                        while not self.wlan.isconnected():
+                         machine.idle()      
+                        print('WLAN connection successful')
+                        #print(self.wlan.ifconfig())
+                        return True
+            return False
