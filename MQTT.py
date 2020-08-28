@@ -21,14 +21,7 @@ with open(certificate_file, "r") as f:
 class mqtt:
     
     def __init__(self):              
-        # Setup WiFi connection.
-        #self.wlan = network.WLAN( network.STA_IF )
-        #self.wlan.active( True )
-        #self.wlan.connect("username", "password" )
-        #time.sleep(3)
-        #print('wifi Connected')
-        #while not self.wlan.isconnected():
-          #machine.idle()
+
         # Connect to MQTT broker.
         self.mqtt = MQTTClient( client_id="esp32_Upython",
                            server=HOST,
