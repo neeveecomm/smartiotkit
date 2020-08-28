@@ -8,7 +8,7 @@ import usocket as socket
 import gc
 gc.collect()
 
-class WAVWireless():
+class NVWireless():
     def __init__(self):
         self.filename = "wifiap.json"
         self.wifiCfg = self.reload()
