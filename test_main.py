@@ -1,6 +1,6 @@
 from fingerprint import fingerprint
 from MQTT import mqtt
-from WiFi import WAVWireless
+from WiFi import NVWireless
 import machine
 import time
 
