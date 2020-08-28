@@ -5,7 +5,7 @@ import machine
 import time
 
 #connecting to WiFi
-w = WAVWireless()
+w = NVWireless()
 w.scanAndConnect()
 
 #enabling the Interrupt pin for Biometric module
